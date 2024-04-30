@@ -81,7 +81,8 @@ router.patch("/editUser/:id", (req, res) => {
 
 
 
-// buscar usuario por ID
+// buscar usuario por ID boorrar
+/*
 router.get("/SerchById/:id", (req, res) => {
     const userId = req.params.id;
 
@@ -96,6 +97,16 @@ router.get("/SerchById/:id", (req, res) => {
             res.status(500).json({ message: "Error al buscar al usuario.", error: err });
         });
 });
+*/
+
+// get para mostrar todos los usuarios
+router.get("/GetAll",(req,res)=> {
+    Usuario.find()
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+
+})
+
 
 
 
