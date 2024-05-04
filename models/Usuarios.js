@@ -27,12 +27,12 @@ const UsuariosSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    tipodedocuemento:{
+    tipodedocumento:{
         type: String,
         required: true
     },
     documento:{
-        type: String,
+        type: number,
         required: true
     },
     rol:{
@@ -44,7 +44,7 @@ const UsuariosSchema = new mongoose.Schema({
     Especialidades: {
         idEspecialidades:{
             type:Number,
-            require:true
+            required:true
         }, 
     },
     estado:{
@@ -67,7 +67,7 @@ const UsuariosSchema = new mongoose.Schema({
     Ubicacion: {
         idUbicacion:{
             type:Number,
-            require:true,
+            required:true,
         }
     }
 

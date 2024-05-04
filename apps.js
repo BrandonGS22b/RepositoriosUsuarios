@@ -16,6 +16,8 @@ app.use("/usuarios", rutaUsuarios);
 
 conexionDB();
 
+
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
