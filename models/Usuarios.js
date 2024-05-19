@@ -40,7 +40,7 @@ const UsuariosSchema = new mongoose.Schema({
         required: true
     },
 
-    //se agregan los atriburos de espeialidadessss
+    //se agregan los atriburos de espeialidadessasssssssssssssssss12
     Especialidades: {
         idEspecialidades:{
             type:Number,
