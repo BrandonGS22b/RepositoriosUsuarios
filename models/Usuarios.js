@@ -32,7 +32,7 @@ const UsuariosSchema = new mongoose.Schema({
         required: true
     },
     documento:{
-        type: number,
+        type: Number,
         required: true
     },
     rol:{
