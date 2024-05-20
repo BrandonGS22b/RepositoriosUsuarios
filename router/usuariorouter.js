@@ -115,7 +115,7 @@ router.get("/SearchByLastName/:apellido",(req,res)=> {
         .catch(error => res.json ({mensaje: error}));
 });
 
-//inicio de sesion
+// Inicio de sesión
 router.post("/LoginByUser", (req, res) => {
     const { correo, clave } = req.body;
 
@@ -126,7 +126,8 @@ router.post("/LoginByUser", (req, res) => {
                 if (existUser.clave === clave) {
                     const user = { correo: correo, clave: clave };
                     const accessToken = generateAccessToken(user);
-                    res.header('authorization', accessToken).json({
+                    // Enviar el token como parte del cuerpo de la respuesta
+                    res.json({
                         message: 'Usuario autenticado',
                         token: accessToken,
                         rol: existUser.rol // Incluir el rol del usuario en la respuesta
@@ -143,11 +144,6 @@ router.post("/LoginByUser", (req, res) => {
         });
 });
 
-function generateAccessToken(user) {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '1m' });
-}
-
-////////////////////////////////////////////////////////////////////////
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
@@ -164,7 +160,6 @@ function verifyToken(req, res, next) {
         next();
     });
 }
-
 
 // Ruta para obtener información del usuario autenticado
 router.get('/me', verifyToken, async (req, res) => {
