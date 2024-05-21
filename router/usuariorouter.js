@@ -21,11 +21,9 @@ import bcryptjs from 'bcryptjs';
 router.post("/createUser", async (req, res) => {
     try {
         // Verificar si el usuario ya existe
-        console.log("Se va a comparar el siguiente correo en la base de datos: " + req.body.correo);
         const existingUser = await Usuario.findOne({ correo: req.body.correo });
-        console.log("Usuario existente: ", existingUser); 
         if (existingUser) {
-            return res.status(400).json({ message: "El usuario ya existe.", existingUser: req.body.correo });
+            return res.status(400).json({ message: "El usuario ya existe." });
         }
 
         // Encriptar la contraseña
