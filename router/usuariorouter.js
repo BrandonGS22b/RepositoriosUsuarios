@@ -122,13 +122,20 @@ router.post("/LoginByUser", (req, res) => {
     Usuario.findOne({ correo: correo})
         .then(existUser => {
             if(existUser){
+                if (existUser.estado === 'inactivo') {
+                    return res.status(403).json({ message: "El usuario está inactivo." });
+                }
+
                 //Authenticar datos correo y clave
                 if(existUser.clave === clave){
                     const user = {correo: correo, clave: clave}
                     const accessToken = generateAccessToken(user);
                     res.header('authorization', accessToken).json({
                         message: 'Usuario autenticado',
-                        token: accessToken
+                        token: accessToken,
+                        rol: existUser.rol, // Incluir el rol del usuario en la respuesta
+                        nombres:existUser.nombres,
+                        usuario: existUser, // Incluir el objeto del usuario en la respuesta
                     });
                     return res.status(200).json({ message: "Inicio de sesión exitoso." });
                 }else{
