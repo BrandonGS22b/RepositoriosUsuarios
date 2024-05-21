@@ -44,7 +44,7 @@ const UsuariosSchema = new mongoose.Schema({
     Especialidades: {
         idEspecialidades:{
             type:Number,
-            required:true
+            required:false,
         }, 
     },
     estado:{
@@ -67,7 +67,7 @@ const UsuariosSchema = new mongoose.Schema({
     Ubicacion: {
         idUbicacion:{
             type:Number,
-            required:true,
+            required:false,
         }
     }
 
