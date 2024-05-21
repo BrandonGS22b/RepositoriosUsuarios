@@ -25,7 +25,7 @@ router.post("/createUser", async (req, res) => {
         const existingUser = await Usuario.findOne({ correo: req.body.correo });
         console.log("Usuario existente: ", existingUser); 
         if (existingUser) {
-            return res.status(400).json({ message: "El usuario ya existe?.", correo: req.body.correo });
+            return res.status(400).json({ message: "El usuario ya existe.", existingUser: req.body.correo });
         }
 
         // Encriptar la contraseña
