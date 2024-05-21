@@ -122,7 +122,7 @@ router.post("/LoginByUser", (req, res) => {
     Usuario.findOne({ correo: correo})
         .then(existUser => {
             if(existUser){
-                if (existUser.estado === 'inactivo') {
+                if (existUser.estado !== 'activo') {
                     return res.status(403).json({ message: "El usuario está inactivo." });
                 }
 
