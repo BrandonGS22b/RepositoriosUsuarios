@@ -115,35 +115,41 @@ router.get("/SearchByLastName/:apellido",(req,res)=> {
         .catch(error => res.json ({mensaje: error}));
 });
 
-// Inicio de sesión
+//inicio de sesion
 router.post("/LoginByUser", (req, res) => {
-    const { correo, clave } = req.body;
+    const { correo, clave} = req.body;
 
-    Usuario.findOne({ correo: correo })
+    Usuario.findOne({ correo: correo})
         .then(existUser => {
-            if (existUser) {
-                // Autenticar datos correo y clave
-                if (existUser.clave === clave) {
-                    const user = { correo: correo, clave: clave };
+            if(existUser){
+                //Authenticar datos correo y clave
+                if(existUser.clave === clave){
+                    const user = {correo: correo, clave: clave}
                     const accessToken = generateAccessToken(user);
-                    // Enviar el token como parte del cuerpo de la respuesta
-                    res.json({
+                    res.header('authorization', accessToken).json({
                         message: 'Usuario autenticado',
-                        token: accessToken,
-                        rol: existUser.rol // Incluir el rol del usuario en la respuesta
+                        token: accessToken
                     });
-                } else {
+                    return res.status(200).json({ message: "Inicio de sesión exitoso." });
+                }else{
                     return res.status(401).json({ message: "Contraseña incorrecta." });
                 }
-            } else {
-                return res.status(400).json({ message: "El usuario no se encuentra registrado." });
+            }else{
+                return res.status(400).json({ message: "El usuario no se encueentra registrado." });
             }
         })
         .catch(err => {
             res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err });
         });
+
 });
 
+function generateAccessToken(user){
+    return jwt.sign(user, process.env.SECRET, {expiresIn: '30m'});
+}
+
+
+////////////////////////////////////////////////////////////////////////
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
@@ -160,6 +166,7 @@ function verifyToken(req, res, next) {
         next();
     });
 }
+
 
 // Ruta para obtener información del usuario autenticado
 router.get('/me', verifyToken, async (req, res) => {
