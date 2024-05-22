@@ -8,10 +8,17 @@ const app = express();
 const corsOptions = {
   origin: 'http://localhost:3000', // Permitir solicitudes solo desde localhost:3000
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Permitir los métodos HTTP especificados
+  allowedHeaders: ['Content-Type', 'Authorization'], // Permitir estos encabezados
+  preflightContinue: false, // Si se debe pasar al siguiente handler después de una solicitud de preflight
+  optionsSuccessStatus: 204 // Estado a devolver para las solicitudes OPTIONS exitosas
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Ruta para verificar preflight request
+app.options('*', cors(corsOptions)); // Handle preflight requests
+
 app.use("/usuarios", rutaUsuarios);
 
 conexionDB();
