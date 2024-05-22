@@ -120,34 +120,33 @@ router.post("/LoginByUser", (req, res) => {
     const { correo, clave} = req.body;
 
     Usuario.findOne({ correo: correo})
-        .then(existUser => {
-            if(existUser){
-                if (existUser.estado !== 'activo') {
-                    return res.status(403).json({ message: "El usuario está inactivo." });
-                }
-
-                //Authenticar datos correo y clave
-                if(existUser.clave === clave){
-                    const user = {correo: correo, clave: clave}
-                    const accessToken = generateAccessToken(user);
-                    res.header('authorization', accessToken).json({
-                        message: 'Usuario autenticado',
-                        token: accessToken,
-                        rol: existUser.rol, // Incluir el rol del usuario en la respuesta
-                        nombres:existUser.nombres,
-                        usuario: existUser, // Incluir el objeto del usuario en la respuesta
-                    });
-                    return res.status(200).json({ message: "Inicio de sesión exitoso." });
-                }else{
-                    return res.status(401).json({ message: "Contraseña incorrecta." });
-                }
-            }else{
-                return res.status(400).json({ message: "El usuario no se encueentra registrado." });
+    .then(existUser => {
+        if(existUser){
+            if (existUser.estado !== 'activo') {
+                return res.status(403).json({ message: "El usuario está inactivo." });
             }
-        })
-        .catch(err => {
-            res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err });
-        });
+
+            //Autenticar datos correo y clave
+            if(existUser.clave === clave){
+                const user = {correo: correo, clave: clave}
+                const accessToken = generateAccessToken(user);
+                res.header('authorization', accessToken).json({
+                    message: 'Usuario autenticado',
+                    token: accessToken,
+                    rol: existUser.rol, // Incluir el rol del usuario en la respuesta
+                    nombres:existUser.nombres,
+                    usuario: existUser, // Incluir el objeto del usuario en la respuesta
+                });
+            }else{
+                return res.status(401).json({ message: "Contraseña incorrecta." });
+            }
+        }else{
+            return res.status(400).json({ message: "El usuario no se encuentra registrado." });
+        }
+    })
+    .catch(err => {
+        res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err });
+    });
 
 });
 
