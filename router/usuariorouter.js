@@ -50,7 +50,7 @@ router.post("/createUser", async (req, res) => {
 router.patch("/EditUser/:id", async  (req, res) => {
     if(req.body.clave){
         // Encriptar la contraseña
-        const hashedPassword = await bcryptjs.hash(req.body.clave, 15);3
+        const hashedPassword = await bcryptjs.hash(req.body.clave, 15);
         // Actualizar el usuario con la contraseña encriptada
         req.body.clave = hashedPassword;
     }
@@ -152,7 +152,7 @@ router.post("/LoginByUser", (req, res) => {
 });
 
 function generateAccessToken(user){
-    return jwt.sign(user, process.env.SECRET, {expiresIn: '1m'});
+    return jwt.sign(user, process.env.SECRET);
 }
 
 
