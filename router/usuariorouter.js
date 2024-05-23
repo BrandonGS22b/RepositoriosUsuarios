@@ -44,8 +44,6 @@ router.post("/createUser", async (req, res) => {
 });
 
 
-
-
 //editar Usuario
 router.patch("/EditUser/:id", async  (req, res) => {
     if(req.body.clave){
@@ -75,72 +73,39 @@ router.get("/GetAll",(req,res)=> {
 
 });
 
-//Buscar por Id
-router.get("/SearchById/:_id",(req,res)=> {
-    const {_id} = req.params;
-    Usuario.find({_id: _id})
-        .then(datos => res.json ({Usuario:datos}))
-        .catch(error => res.json ({mensaje: error}));
-});
-
-//Buscar por Documento 
-router.get("/SearchByDocument/:documento",(req,res)=> {
-    const {documento} = req.params;
-    Usuario.find({documento: documento})
-        .then(datos => res.json ({Usuario:datos}))
-        .catch(error => res.json ({mensaje: error}));
-});
-
-//Buscar por Correo 
-router.get("/SearchByEmail/:correo",(req,res)=> {
-    const {correo} = req.params;
-    Usuario.find({correo: correo})
-        .then(datos => res.json ({Usuario:datos}))
-        .catch(error => res.json ({mensaje: error}));
-});
-
-//Buscar por Nombre 
-router.get("/SearchByName/:nombre",(req,res)=> {
-    const {nombre} = req.params;
-    Usuario.find({nombre: nombre})
-        .then(datos => res.json ({Usuario:datos}))
-        .catch(error => res.json ({mensaje: error}));
-});
-
-//Buscar por Apellido 
-router.get("/SearchByLastName/:apellido",(req,res)=> {
-    const {apellido} = req.params;
-    Usuario.find({apellido: apellido})
-        .then(datos => res.json ({Usuario:datos}))
-        .catch(error => res.json ({mensaje: error}));
-});
-
 //inicio de sesion
 router.post("/LoginByUser", (req, res) => {
-    const { correo, clave} = req.body;
+    const { correo, clave } = req.body;
 
-    Usuario.findOne({ correo: correo})
+    Usuario.findOne({ correo: correo })
     .then(existUser => {
-        if(existUser){
-            if (existUser.estado !== 'activo') {
+        if (existUser) {
+            if (existUser.estado !== 'Activo') {
                 return res.status(403).json({ message: "El usuario está inactivo." });
             }
 
-            //Autenticar datos correo y clave
-            if(existUser.clave === clave){
-                const user = {correo: correo, clave: clave}
-                const accessToken = generateAccessToken(user);
-                res.header('authorization', accessToken).json({
-                    message: 'Usuario autenticado',
-                    token: accessToken,
-                    rol: existUser.rol, // Incluir el rol del usuario en la respuesta
-                    nombres:existUser.nombres,
-                    usuario: existUser, // Incluir el objeto del usuario en la respuesta
-                });
-            }else{
-                return res.status(401).json({ message: "Contraseña incorrecta." });
-            }
-        }else{
+            // Comparar la contraseña proporcionada con la contraseña almacenada encriptada
+            bcryptjs.compare(clave, existUser.clave, (err, validPassword) => {
+                if (err) {
+                    return res.status(500).json({ message: "Error al comparar contraseñas." });
+                }
+
+                if (validPassword) {
+                    // Si las contraseñas coinciden, generar y devolver un token JWT
+                    const accessToken = generateAccessToken({ correo: correo });
+                    res.header('authorization', accessToken).json({
+                        message: 'Usuario autenticado',
+                        token: accessToken,
+                        rol: existUser.rol,
+                        nombres: existUser.nombres,
+                        usuario: existUser
+                    });
+                } else {
+                    // Si las contraseñas no coinciden, devolver un mensaje de error
+                    return res.status(401).json({ message: "Contraseña incorrecta." });
+                }
+            });
+        } else {
             return res.status(400).json({ message: "El usuario no se encuentra registrado." });
         }
     })
@@ -151,7 +116,7 @@ router.post("/LoginByUser", (req, res) => {
 });
 
 function generateAccessToken(user){
-    return jwt.sign(user, process.env.SECRET);
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '1m' });
 }
 
 
@@ -194,7 +159,48 @@ router.get('/me', verifyToken, async (req, res) => {
 //////////////////////////////////////////////////////////////////
 
 
+//Buscar por Id
+router.get("/SearchById/:_id",(req,res)=> {
+    const {_id} = req.params;
+    Usuario.find({_id: _id})
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+});
 
+//Buscar por Documento 
+router.get("/SearchByDocument/:documento",(req,res)=> {
+    const {documento} = req.params;
+    Usuario.find({documento: documento})
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+});
+
+//Buscar por Correo 
+router.get("/SearchByEmail/:correo",(req,res)=> {
+    const {correo} = req.params;
+    Usuario.find({correo: correo})
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+});
+
+
+
+//Buscar por Nombre 
+router.get("/SearchByName/:nombre",(req,res)=> {
+    const {nombre} = req.params;
+    Usuario.find({nombre: nombre})
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+});
+
+
+//Buscar por Apellido 
+router.get("/SearchByLastName/:apellido",(req,res)=> {
+    const {apellido} = req.params;
+    Usuario.find({apellido: apellido})
+        .then(datos => res.json ({Usuario:datos}))
+        .catch(error => res.json ({mensaje: error}));
+});
 
 
 
