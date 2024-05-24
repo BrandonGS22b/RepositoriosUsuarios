@@ -32,15 +32,7 @@ router.post("/LoginByUser", async (req, res) => {
         }
 
         // Comparar la contraseña ingresada con la almacenada en la base de datos
-        let validPassword = false;
-
-        // Intentar comparar usando bcryptjs si la contraseña almacenada está encriptada
-        if (existUser.clave.startsWith('$2b$')) {
-            validPassword = await bcryptjs.compare(clave, existUser.clave);
-        } else {
-            // Comparar directamente si la contraseña almacenada no está encriptada
-            validPassword = (clave === existUser.clave);
-        }
+        const validPassword = await bcryptjs.compare(clave, existUser.clave);
 
         if (!validPassword) {
             return res.status(401).json({ message: "Contraseña incorrecta." });
