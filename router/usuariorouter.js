@@ -55,7 +55,7 @@ router.post("/LoginByUser", async (req, res) => {
 
 // Función para generar el token de acceso
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '1h' }); // Opcional: agregar tiempo de expiración
+    return jwt.sign(user, process.env.SECRET); // Opcional: agregar tiempo de expiración
 }
 
 // Middleware para verificar el token
@@ -87,7 +87,7 @@ router.post("/createUser", async (req, res) => {
         }
 
         // Encriptar la contraseña
-        const hashedPassword = await bcryptjs.hash(req.body.clave, 15);
+        const hashedPassword = await bcryptjs.hash(req.body.clave, 7);
 
         // Crear un nuevo objeto de usuario con la contraseña encriptada
         const newUser = new Usuario({
@@ -108,7 +108,7 @@ router.post("/createUser", async (req, res) => {
 router.patch("/EditUser/:id", async  (req, res) => {
     if(req.body.clave){
         // Encriptar la contraseña
-        const hashedPassword = await bcryptjs.hash(req.body.clave, 15);
+        const hashedPassword = await bcryptjs.hash(req.body.clave, 7);
         // Actualizar el usuario con la contraseña encriptada
         req.body.clave = hashedPassword;
     }
