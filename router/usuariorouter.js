@@ -15,6 +15,74 @@ import bcryptjs from 'bcryptjs';
 
 
 //inicio session
+// Ruta para iniciar sesión
+router.post("/LoginByUser", async (req, res) => {
+    const { correo, clave } = req.body;
+
+    try {
+        // Buscar usuario por correo
+        const existUser = await Usuario.findOne({ correo });
+
+        if (!existUser) {
+            return res.status(400).json({ message: "El usuario no se encuentra registrado." });
+        }
+
+        if (existUser.estado !== 'Activo') {
+            return res.status(403).json({ message: "El usuario está inactivo." });
+        }
+
+        // Comparar la contraseña ingresada con la almacenada en la base de datos
+        let validPassword = false;
+
+        // Intentar comparar usando bcryptjs si la contraseña almacenada está encriptada
+        if (existUser.clave.startsWith('$2b$')) {
+            validPassword = await bcryptjs.compare(clave, existUser.clave);
+        } else {
+            // Comparar directamente si la contraseña almacenada no está encriptada
+            validPassword = (clave === existUser.clave);
+        }
+
+        if (!validPassword) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        // Generar token de acceso
+        const accessToken = generateAccessToken({ correo: correo });
+        res.header('authorization', accessToken).json({
+            message: 'Usuario autenticado',
+            token: accessToken,
+            rol: existUser.rol,
+            nombres: existUser.nombres,
+            usuario: existUser
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err.message });
+    }
+});
+
+// Función para generar el token de acceso
+function generateAccessToken(user) {
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '1h' }); // Opcional: agregar tiempo de expiración
+}
+
+// Middleware para verificar el token
+function verifyToken(req, res, next) {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).json({ message: "No se proporcionó ningún token." });
+    }
+
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: "El token no es válido." });
+        }
+        req.userId = decoded.id;
+        next();
+    });
+}
+
 //crear usuario hasheado 
 // Crear Usuario
 
@@ -73,61 +141,6 @@ router.get("/GetAll",(req,res)=> {
 
 });
 
-// Inicio de sesión
-router.post("/LoginByUser", async (req, res) => {
-    const { correo, clave } = req.body;
-
-    try {
-        const existUser = await Usuario.findOne({ correo });
-
-        if (!existUser) {
-            return res.status(400).json({ message: "El usuario no se encuentra registrado." });
-        }
-
-        if (existUser.estado !== 'Activo') {
-            return res.status(403).json({ message: "El usuario está inactivo." });
-        }
-
-        const validPassword = await bcryptjs.compare(clave, existUser.clave);
-
-        if (!validPassword) {
-            return res.status(401).json({ message: "Contraseña incorrecta." });
-        }
-
-        const accessToken = generateAccessToken({ correo: correo });
-        res.header('authorization', accessToken).json({
-            message: 'Usuario autenticado',
-            token: accessToken,
-            rol: existUser.rol,
-            nombres: existUser.nombres,
-            usuario: existUser
-        });
-
-    } catch (err) {
-        res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err.message });
-    }
-});
-
-function generateAccessToken(user){
-    return jwt.sign(user, process.env.SECRET);
-}
-
-// Middleware para verificar el token
-function verifyToken(req, res, next) {
-    const token = req.headers.authorization;
-
-    if (!token) {
-        return res.status(401).json({ message: "No se proporcionó ningún token." });
-    }
-
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json({ message: "El token no es válido." });
-        }
-        req.userId = decoded.id;
-        next();
-    });
-}
 
 // Ruta para obtener información del usuario autenticado
 router.get('/me', verifyToken, async (req, res) => {
