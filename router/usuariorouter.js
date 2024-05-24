@@ -73,54 +73,45 @@ router.get("/GetAll",(req,res)=> {
 
 });
 
-//inicio de sesion
-router.post("/LoginByUser", (req, res) => {
+// Inicio de sesión
+router.post("/LoginByUser", async (req, res) => {
     const { correo, clave } = req.body;
 
-    Usuario.findOne({ correo: correo })
-    .then(existUser => {
-        if (existUser) {
-            if (existUser.estado !== 'Activo') {
-                return res.status(403).json({ message: "El usuario está inactivo." });
-            }
+    try {
+        const existUser = await Usuario.findOne({ correo });
 
-            // Comparar la contraseña proporcionada con la contraseña almacenada encriptada
-            bcryptjs.compare(clave, existUser.clave, (err, validPassword) => {
-                if (err) {
-                    return res.status(500).json({ message: "Error al comparar contraseñas." });
-                }
-
-                if (validPassword) {
-                    // Si las contraseñas coinciden, generar y devolver un token JWT
-                    const accessToken = generateAccessToken({ correo: correo });
-                    res.header('authorization', accessToken).json({
-                        message: 'Usuario autenticado',
-                        token: accessToken,
-                        rol: existUser.rol,
-                        nombres: existUser.nombres,
-                        usuario: existUser
-                    });
-                } else {
-                    // Si las contraseñas no coinciden, devolver un mensaje de error
-                    return res.status(401).json({ message: "Contraseña incorrecta." });
-                }
-            });
-        } else {
+        if (!existUser) {
             return res.status(400).json({ message: "El usuario no se encuentra registrado." });
         }
-    })
-    .catch(err => {
-        res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err });
-    });
 
+        if (existUser.estado !== 'Activo') {
+            return res.status(403).json({ message: "El usuario está inactivo." });
+        }
+
+        const validPassword = await bcryptjs.compare(clave, existUser.clave);
+
+        if (!validPassword) {
+            return res.status(401).json({ message: "Contraseña incorrecta." });
+        }
+
+        const accessToken = generateAccessToken({ correo: correo });
+        res.header('authorization', accessToken).json({
+            message: 'Usuario autenticado',
+            token: accessToken,
+            rol: existUser.rol,
+            nombres: existUser.nombres,
+            usuario: existUser
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error al buscar al usuario en la base de datos.", error: err.message });
+    }
 });
 
 function generateAccessToken(user){
     return jwt.sign(user, process.env.SECRET);
 }
 
-
-////////////////////////////////////////////////////////////////////////
 // Middleware para verificar el token
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
@@ -138,7 +129,6 @@ function verifyToken(req, res, next) {
     });
 }
 
-
 // Ruta para obtener información del usuario autenticado
 router.get('/me', verifyToken, async (req, res) => {
     try {
@@ -153,7 +143,6 @@ router.get('/me', verifyToken, async (req, res) => {
         res.status(500).json({ message: "Error al buscar al usuario.", error: error });
     }
 });
-
 
 
 //////////////////////////////////////////////////////////////////
