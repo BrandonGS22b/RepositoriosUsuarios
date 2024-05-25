@@ -45,7 +45,8 @@ router.post("/LoginByUser", async (req, res) => {
             token: accessToken,
             rol: existUser.rol,
             nombres: existUser.nombres,
-            usuario: existUser
+            usuario: existUser,
+            _id: existUser._id,
         });
 
     } catch (err) {
