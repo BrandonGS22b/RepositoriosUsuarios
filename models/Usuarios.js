@@ -14,48 +14,78 @@ const UsuariosSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    tipoDocumento:{
+        type: String,
+        required: true
+    },
+    documento:{
+        type: String,
+        required: true
+    },
+
+    
     direccion:{
         
         type: String,
         required: true
     },
+    ubicacion: {
+        idUbicacion:{
+            type:String,
+            required:true,
+        },
+        departamento:{
+            type:String,
+            required:true,
+        },
+        municipio:{
+            type:String,
+            required:true,
+        },
+        codigoUbicacion:{
+            type:String,
+            required:true,
+        },
+    },
     telefono:{
         type: String,
-        required: true
-    },
-    correo:{
-        type: String,
-        required: true
-    },
-    tipodedocumento:{
-        type: String,
-        required: true
-    },
-    documento:{
-        type: Number,
         required: true
     },
     rol:{
         type: String,
         required: true
     },
-
-    //se agregan los atriburos de espeialidadessasssssssssssssssss12
-    Especialidades: {
+   
+    especialidad: {
         idEspecialidades:{
-            type:Number,
-            required:false,
+            type:String,
+            required:true,
+        }, 
+        especialidad:{
+            type:String,
+            required:true,
         }, 
     },
+  
+   
+   
+
+    //se agregan los atriburos de espeialidadessasssssssssssssssss12
+
     estado:{
         type: String,
         required: true
     },
-    fechanacimiento:{
+    fechaNacimiento:{
         type: Date,
         required: true
     },
-    tiposangre:{
+    tipoSangre:{
+        type: String,
+        required: true
+    },
+    correo:{
         type: String,
         required: true
     },
@@ -64,12 +94,7 @@ const UsuariosSchema = new mongoose.Schema({
         required: true
     },
    
-    Ubicacion: {
-        idUbicacion:{
-            type:Number,
-            required:false,
-        }
-    }
+   
 
     
 });
