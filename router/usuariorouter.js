@@ -106,23 +106,32 @@ router.post("/createUser", async (req, res) => {
 
 
 //editar Usuario
-router.patch("/EditUser/:id", async  (req, res) => {
-    if(req.body.clave){
-        // Encriptar la contraseña
-        const hashedPassword = await bcryptjs.hash(req.body.clave, 7);
-        // Actualizar el usuario con la contraseña encriptada
-        req.body.clave = hashedPassword;
+router.patch("/EditUser/:id", async (req, res) => {
+    try {
+        // Si se proporciona una nueva contraseña, encriptarla antes de actualizar el usuario
+        if (req.body.clave) {
+            const hashedPassword = await bcryptjs.hash(req.body.clave, 7);
+            req.body.clave = hashedPassword;
+        }
+
+        // Encuentra y actualiza el usuario con el ID proporcionado
+        const updatedUser = await Usuario.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: req.body },
+            { new: true }
+        );
+
+        // Si no se encontró el usuario, devuelve un mensaje de error
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+
+        // Si se actualizó correctamente, devuelve el usuario actualizado
+        res.json(updatedUser);
+    } catch (error) {
+        // Manejo de errores: devuelve un mensaje de error y el estado 500 (Error del servidor)
+        res.status(500).json({ message: "Error al actualizar el usuario.", error: error.message });
     }
-    Usuario.findOneAndUpdate(
-        {_id: req.params.id },
-        {$set: req.body},
-        {new: true}
-    ).then((data) => {
-        res.json(data);
-    })
-    .catch((err) => {
-        res.json({ message: err})
-    });
 });
 
 
