@@ -249,5 +249,14 @@ router.post("/logout", (req, res) => {
     }
 });
 
-
+// Ruta para eliminar todos los usuarios
+router.delete("/DeleteAll", async (req, res) => {
+    try {
+        // Utiliza el método deleteMany() para eliminar todos los documentos de la colección
+        const result = await Usuario.deleteMany({});
+        res.status(200).json({ message: "Todos los usuarios han sido eliminados exitosamente.", deletedCount: result.deletedCount });
+    } catch (error) {
+        res.status(500).json({ message: "Error al eliminar todos los usuarios.", error: error.message });
+    }
+});
 export default router;

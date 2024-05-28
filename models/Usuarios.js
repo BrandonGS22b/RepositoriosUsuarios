@@ -68,9 +68,6 @@ const UsuariosSchema = new mongoose.Schema({
         }, 
     },
   
-   
-   
-
     //se agregan los atriburos de espeialidadessasssssssssssssssss12
 
     estado:{
