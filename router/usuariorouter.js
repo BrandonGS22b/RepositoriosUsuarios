@@ -291,33 +291,19 @@ router.post("/ValidateCorreoCedula", async (req, res) => {
 export default router;
 
 
-// Función para resetear la contraseña
-router.patch("/resetPassword", async (req, res) => {
-    const { userId, clave } = req.body;
+// Ruta para cambiar la contraseña
+router.patch("/changePassword", async (req, res) => {
+    const { correo, newPassword } = req.body;
 
     try {
-        // Asegúrate de que se ha proporcionado el identificador del usuario y la nueva contraseña
-        if (!userId || !clave) {
-            return res.status(400).json({ message: "No se proporcionó un identificador de usuario o una nueva contraseña." });
-        }
-
-        // Buscar usuario por ID
-        const existUser = await Usuario.findById(userId);
-
-        if (!existUser) {
-            return res.status(400).json({ message: "El usuario no se encuentra registrado." });
-        }
-
         // Encriptar la nueva contraseña
-        const hashedPassword = await bcryptjs.hash(clave, 7);
+        const hashedPassword = await bcryptjs.hash(newPassword, 7);
 
         // Actualizar la contraseña del usuario
-        existUser.clave = hashedPassword;
-        await existUser.save();
+        await Usuario.updateOne({ correo }, { $set: { clave: hashedPassword } });
 
-        res.json({ message: "Contraseña restablecida exitosamente." });
-
-    } catch (err) {
-        res.status(500).json({ message: "Error al restablecer la contraseña.", error: err.message });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ message: "Error al cambiar la contraseña.", error: error.message });
     }
 });
