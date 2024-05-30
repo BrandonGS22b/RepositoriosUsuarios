@@ -295,13 +295,22 @@ router.patch("/changePassword", async (req, res) => {
     const { correo, clave } = req.body;
 
     try {
+        // Encriptar la nueva contraseña
         const hashedPassword = await bcryptjs.hash(clave, 7);
-        const updatedUser = await Usuario.updateOne({ correo }, { $set: { clave: hashedPassword } });
-        if (updatedUser.nModified > 0) {
-            res.json({ success: true });
-        } else {
-            res.status(400).json({ success: false, message: "Usuario no encontrado o contraseña no actualizada." });
+
+        // Buscar al usuario por correo
+        const user = await Usuario.findOne({ correo });
+
+        // Verificar si se encontró al usuario
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Usuario no encontrado." });
         }
+
+        // Actualizar la contraseña del usuario
+        user.clave = hashedPassword;
+        await user.save();
+
+        res.json({ success: true });
     } catch (error) {
         res.status(500).json({ message: "Error al cambiar la contraseña.", error: error.message });
     }
