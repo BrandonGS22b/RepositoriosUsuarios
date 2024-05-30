@@ -292,7 +292,7 @@ export default router;
 
 
 // Función para resetear la contraseña
-router.post("/resetPassword", async (req, res) => {
+router.patch("/resetPassword", async (req, res) => {
     const { clave } = req.body;
 
     try {
