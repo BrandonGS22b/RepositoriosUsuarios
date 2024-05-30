@@ -293,16 +293,16 @@ export default router;
 
 // Función para resetear la contraseña
 router.patch("/resetPassword", async (req, res) => {
-    const { clave } = req.body;
+    const { userId, clave } = req.body;
 
     try {
-        // Validar que el usuario esté autenticado
-        if (!req.userId) {
-            return res.status(401).json({ message: "No se proporcionó un token válido." });
+        // Asegúrate de que se ha proporcionado el identificador del usuario y la nueva contraseña
+        if (!userId || !clave) {
+            return res.status(400).json({ message: "No se proporcionó un identificador de usuario o una nueva contraseña." });
         }
 
         // Buscar usuario por ID
-        const existUser = await Usuario.findById(req.userId);
+        const existUser = await Usuario.findById(userId);
 
         if (!existUser) {
             return res.status(400).json({ message: "El usuario no se encuentra registrado." });
