@@ -120,11 +120,13 @@ router.patch("/EditUser/:id", async (req, res) => {
             { $set: req.body },
             { new: true }
         );
-
+        
         // Si no se encontró el usuario, devuelve un mensaje de error
         if (!updatedUser) {
             return res.status(404).json({ message: "Usuario no encontrado." });
         }
+        
+        
 
         // Si se actualizó correctamente, devuelve el usuario actualizado
         res.json(updatedUser);
@@ -287,3 +289,35 @@ router.post("/ValidateCorreoCedula", async (req, res) => {
 });
 
 export default router;
+
+
+// Función para resetear la contraseña
+router.post("/resetPassword", async (req, res) => {
+    const { clave } = req.body;
+
+    try {
+        // Validar que el usuario esté autenticado
+        if (!req.userId) {
+            return res.status(401).json({ message: "No se proporcionó un token válido." });
+        }
+
+        // Buscar usuario por ID
+        const existUser = await Usuario.findById(req.userId);
+
+        if (!existUser) {
+            return res.status(400).json({ message: "El usuario no se encuentra registrado." });
+        }
+
+        // Encriptar la nueva contraseña
+        const hashedPassword = await bcryptjs.hash(clave, 7);
+
+        // Actualizar la contraseña del usuario
+        existUser.clave = hashedPassword;
+        await existUser.save();
+
+        res.json({ message: "Contraseña restablecida exitosamente." });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error al restablecer la contraseña.", error: err.message });
+    }
+});
