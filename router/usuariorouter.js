@@ -268,4 +268,22 @@ router.delete("/DeleteAll", async (req, res) => {
         res.status(500).json({ message: "Error al eliminar todos los usuarios.", error: error.message });
     }
 });
+
+//metodo funciona para poder validar los objetos de la base de datos aqui voy a mandar a validar el correo y cedula
+router.post("/ValidateCorreoCedula", async (req, res) => {
+    const { correo, documento } = req.body;
+
+    try {
+        const user = await Usuario.findOne({ correo, documento: documento });
+
+        if (user) {
+            res.status(200).json({ isValid: true });
+        } else {
+            res.status(400).json({ isValid: false, message: "Correo o cédula incorrectos." });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error al validar correo y cédula.", error: error.message });
+    }
+});
+
 export default router;
