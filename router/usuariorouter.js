@@ -274,8 +274,8 @@ router.post("/ValidateCorreoCedula", async (req, res) => {
     const { correo, documento } = req.body;
 
     try {
-        const user = await Usuario.findOne({ correo, documento: documento });
-
+        const user = await Usuario.findOne({ correo, documento });
+        console.log(user)
         if (user) {
             res.status(200).json({ isValid: true });
         } else {
