@@ -291,19 +291,20 @@ router.post("/ValidateCorreoCedula", async (req, res) => {
 export default router;
 
 
-// Ruta para cambiar la contraseña
 router.patch("/changePassword", async (req, res) => {
-    const { correo, newPassword } = req.body;
+    
+    const { correo, clave } = req.body;
 
     try {
-        // Encriptar la nueva contraseña
-        const hashedPassword = await bcryptjs.hash(newPassword, 7);
 
-        // Actualizar la contraseña del usuario
-        await Usuario.updateOne({ correo }, { $set: { clave: hashedPassword } });
+        const hashedPassword = await bcryptjs.hash(clave, 7);
 
+        await Usuario.updateOne({ correo }, { $set: { clave: clave } });
+
+ 
         res.json({ success: true });
     } catch (error) {
+    
         res.status(500).json({ message: "Error al cambiar la contraseña.", error: error.message });
     }
 });
