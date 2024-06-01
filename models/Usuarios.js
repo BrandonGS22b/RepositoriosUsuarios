@@ -33,19 +33,19 @@ const UsuariosSchema = new mongoose.Schema({
     ubicacion: {
         idUbicacion:{
             type:String,
-            required:true,
+            required:false,
         },
         departamento:{
             type:String,
-            required:true,
+            required:false,
         },
         municipio:{
             type:String,
-            required:true,
+            required:false,
         },
         codigoUbicacion:{
             type:String,
-            required:true,
+            required:false,
         },
     },
     telefono:{
@@ -60,11 +60,11 @@ const UsuariosSchema = new mongoose.Schema({
     especialidad: {
         idEspecialidades:{
             type:String,
-            required:true,
+            required:false,
         }, 
         especialidad:{
             type:String,
-            required:true,
+            required:false,
         }, 
     },
   
