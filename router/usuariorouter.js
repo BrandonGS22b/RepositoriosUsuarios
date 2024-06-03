@@ -260,14 +260,22 @@ router.post("/logout", (req, res) => {
     }
 });
 
-// Ruta para eliminar todos los usuarios
-router.delete("/DeleteAll", async (req, res) => {
+// Ruta para eliminar todos los usuarios por id
+router.delete("/Delete/:id", async (req, res) => {
     try {
-        // Utiliza el método deleteMany() para eliminar todos los documentos de la colección
-        const result = await Usuario.deleteMany({});
-        res.status(200).json({ message: "Todos los usuarios han sido eliminados exitosamente.", deletedCount: result.deletedCount });
+        // Utiliza el método findByIdAndDelete() para eliminar el usuario por su ID
+        const deletedUser = await Usuario.findByIdAndDelete(req.params.id);
+        
+        // Si el usuario no existe, devuelve un mensaje de error
+        if (!deletedUser) {
+            return res.status(404).json({ message: "Usuario no encontrado." });
+        }
+        
+        // Si se eliminó correctamente, devuelve un mensaje de éxito
+        res.status(200).json({ message: "Usuario eliminado exitosamente." });
     } catch (error) {
-        res.status(500).json({ message: "Error al eliminar todos los usuarios.", error: error.message });
+        // Manejo de errores: devuelve un mensaje de error y el estado 500 (Error del servidor)
+        res.status(500).json({ message: "Error al eliminar el usuario.", error: error.message });
     }
 });
 
